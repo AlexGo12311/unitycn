@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Герои труда - Единство 团结</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Герои труда <span class="chinese">劳动英雄</span></h1>
+            <p>Примеры самоотверженного труда на благо общества</p>
+            <a href="/" style="color: white; text-decoration: underline;">На главную</a>
+        </div>
+        
+        <div class="heroes-grid">
+            {{range .heroes}}
+            <div class="hero-card">
+                <h3>{{.Name}}</h3>
+                <p>{{.Description}}</p>
+                <small>Родился: {{.BirthDate.Format "02.01.2006"}}</small>
+            </div>
+            {{end}}
+        </div>
+        
+        {{if .isAdmin}}
+        <div class="admin-section">
+            <h3>Администратору</h3>
+            <a href="/admin/heroes">Управление героями</a>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>
