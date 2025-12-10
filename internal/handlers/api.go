@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -77,24 +78,57 @@ func Register(repo *models.Repository) gin.HandlerFunc {
 // === POST HANDLERS ===
 func CreatePost(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID := c.GetInt("user_id")
+		// ДЛЯ ОТЛАДКИ: посмотрим, что в контексте
+		username, exists := c.Get("username")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
+			return
+		}
+
+		// Получаем user_id из базы данных по username
+		user, err := repo.GetUserByUsername(username.(string))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Пользователь не найден",
+				"details": err.Error(),
+			})
+			return
+		}
 
 		var req struct {
 			Content string `json:"content"`
 		}
 
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   "Неверный формат запроса",
+				"details": err.Error(),
+			})
 			return
 		}
 
-		err := repo.CreatePost(userID, req.Content, "团结")
+		if req.Content == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Содержание поста не может быть пустым"})
+			return
+		}
+
+		// ДЛЯ ОТЛАДКИ: логируем данные
+		log.Printf("Создание поста: user_id=%d, content='%s'", user.ID, req.Content)
+
+		err = repo.CreatePost(user.ID, req.Content, "团结")
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания поста"})
+			log.Printf("Ошибка создания поста: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Ошибка создания поста",
+				"details": err.Error(),
+			})
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"message": "Пост создан"})
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Пост создан",
+			"slogan":  "团结",
+		})
 	}
 }
 

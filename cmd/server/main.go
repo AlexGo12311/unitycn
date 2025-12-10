@@ -27,6 +27,9 @@ type Config struct {
 }
 
 func main() {
+	// Включим подробное логирование
+	log.Println("=== Запуск Communist Twitter ===")
+
 	// Чтение конфига
 	configFile, err := os.Open("config.yaml")
 	if err != nil {
@@ -40,7 +43,10 @@ func main() {
 		log.Fatal("Ошибка парсинга config.yaml:", err)
 	}
 
+	log.Printf("Конфиг загружен: порт=%s", config.Server.Port)
+
 	// Подключение к БД
+	log.Println("Подключение к PostgreSQL...")
 	db, err := database.Connect(config.Database)
 	if err != nil {
 		log.Fatal("Ошибка подключения к БД:", err)
@@ -52,10 +58,14 @@ func main() {
 
 	// Инициализация аутентификации
 	auth.Init(config.Server.Secret)
+	log.Println("Аутентификация инициализирована")
 
 	// Создание админа, если его нет
+	log.Printf("Проверка администратора: %s", config.Admin.Username)
 	if err := ensureAdminExists(repo, config.Admin.Username, config.Admin.Password); err != nil {
 		log.Printf("Предупреждение: не удалось создать администратора: %v", err)
+	} else {
+		log.Println("Администратор проверен/создан")
 	}
 
 	// Настройка маршрутов
