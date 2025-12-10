@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.title}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .post { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+        .slogan { color: #d32f2f; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>{{.title}}</h1>
+    <h2 class="slogan">{{.slogan}}</h2>
+    
+    <h3>Создать пост:</h3>
+    <div id="post-form">
+        <input type="text" id="post-content" placeholder="Ваш пост...">
+        <button onclick="createPost()">Опубликовать (团结)</button>
+    </div>
+    
+    <h3>Последние посты:</h3>
+    {{if .posts}}
+        {{range .posts}}
+        <div class="post">
+            <p>{{.Content}}</p>
+            <p><span class="slogan">{{.Slogan}}</span> • Лайков: {{.Likes}}</p>
+        </div>
+        {{end}}
+    {{else}}
+        <p>Пока нет постов. Будьте первым!</p>
+    {{end}}
+    
+    <script>
+    async function createPost() {
+        const content = document.getElementById('post-content').value;
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            alert('Сначала войдите в систему!');
+            window.location.href = '/login';
+            return;
+        }
+        
+        const response = await fetch('/api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ content: content })
+        });
+        
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Ошибка создания поста');
+        }
+    }
+    </script>
+</body>
+</html>
