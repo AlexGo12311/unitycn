@@ -5,11 +5,12 @@ import (
 )
 
 type User struct {
-	ID        int       `json:"id"`
-	Username  string    `json:"username"`
-	Password  string    `json:"-"`
-	Role      string    `json:"role"` // user, admin
-	CreatedAt time.Time `json:"created_at"`
+	ID          int       `json:"id"`
+	Username    string    `json:"username"`
+	DisplayName string    `json:"display_name"`
+	Password    string    `json:"-"`
+	Role        string    `json:"role"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Post struct {
