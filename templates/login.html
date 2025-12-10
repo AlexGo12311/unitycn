@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход - Единство 团结</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; }
+        form { display: flex; flex-direction: column; gap: 10px; }
+        input, button { padding: 10px; font-size: 16px; }
+        button { background: #d32f2f; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Вход в систему</h1>
+    <p>Для публикации постов требуется авторизация</p>
+    
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Логин" required>
+        <input type="password" id="password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
+    
+    <p style="margin-top: 20px;">
+        <a href="/">На главную</a> | 
+        <button onclick="registerTestUser()">Быстрая регистрация</button>
+    </p>
+    
+    <script>
+    document.getElementById('login-form').onsubmit = async function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            alert('Успешный вход!');
+            window.location.href = '/';
+        } else {
+            alert('Ошибка входа. Проверьте логин/пароль.');
+        }
+    };
+    
+    async function registerTestUser() {
+        const username = 'test_' + Math.floor(Math.random() * 1000);
+        const password = 'test123';
+        
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        
+        if (response.ok) {
+            alert(`Пользователь создан!\nЛогин: ${username}\nПароль: ${password}`);
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        } else {
+            alert('Ошибка регистрации');
+        }
+    }
+    </script>
+</body>
+</html>
