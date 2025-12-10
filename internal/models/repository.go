@@ -14,18 +14,22 @@ func NewRepository(db *sql.DB) *Repository {
 }
 
 // === USERS ===
-func (r *Repository) CreateUser(username, password, role string) error {
-	query := `INSERT INTO users (username, password, role) VALUES ($1, $2, $3)`
-	_, err := r.db.Exec(query, username, password, role)
+func (r *Repository) CreateUser(username, password, role, displayName string) error {
+	if displayName == "" {
+		displayName = username // по умолчанию
+	}
+
+	query := `INSERT INTO users (username, password, role, display_name) VALUES ($1, $2, $3, $4)`
+	_, err := r.db.Exec(query, username, password, role, displayName)
 	return err
 }
 
 func (r *Repository) GetUserByUsername(username string) (*User, error) {
-	query := `SELECT id, username, password, role, created_at FROM users WHERE username = $1`
+	query := `SELECT id, username, display_name, password, role, created_at FROM users WHERE username = $1`
 	row := r.db.QueryRow(query, username)
 
 	var user User
-	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.Role, &user.CreatedAt)
+	err := row.Scan(&user.ID, &user.Username, &user.DisplayName, &user.Password, &user.Role, &user.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
@@ -156,6 +160,40 @@ func (r *Repository) GetPostLikesCount(postID int) (int, error) {
 	var count int
 	err := r.db.QueryRow("SELECT likes FROM posts WHERE id = $1", postID).Scan(&count)
 	return count, err
+}
+
+// Получение по пользователю
+func (r *Repository) GetPostsWithUsers(limit, offset int) ([]Post, error) {
+	query := `
+        SELECT p.id, p.user_id, p.content, p.slogan, p.likes, p.created_at,
+               u.id, u.username, u.display_name, u.role, u.created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+        LIMIT $1 OFFSET $2
+    `
+
+	rows, err := r.db.Query(query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		var post Post
+		var user User
+		err := rows.Scan(
+			&post.ID, &post.UserID, &post.Content, &post.Slogan, &post.Likes, &post.CreatedAt,
+			&user.ID, &user.Username, &user.DisplayName, &user.Role, &user.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		post.User = &user
+		posts = append(posts, post)
+	}
+	return posts, nil
 }
 
 // === HEROES (второй объект) ===

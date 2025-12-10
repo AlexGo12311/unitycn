@@ -88,6 +88,7 @@ func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 	// Основные маршруты
 	r.GET("/", handlers.HomePage(repo))
 	r.GET("/login", handlers.LoginPage())
+	r.GET("/register", handlers.RegisterPage())
 
 	// API
 	api := r.Group("/api")
@@ -131,9 +132,12 @@ func ensureAdminExists(repo *models.Repository, username, hashedPassword string)
 	_, err := repo.GetUserByUsername(username)
 	if err == nil {
 		// Пользователь уже существует
+		log.Printf("Администратор %s уже существует", username)
 		return nil
 	}
 
-	// Если пользователя нет - создаём
-	return repo.CreateUser(username, hashedPassword, "admin")
+	log.Printf("Создание администратора: %s", username)
+
+	// Если пользователя нет - создаём с display_name = username
+	return repo.CreateUser(username, hashedPassword, "admin", username)
 }

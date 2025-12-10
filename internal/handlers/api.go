@@ -49,8 +49,9 @@ func Login(repo *models.Repository, secret string) gin.HandlerFunc {
 func Register(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
+			Username    string `json:"username"`
+			Password    string `json:"password"`
+			DisplayName string `json:"display_name,omitempty"`
 		}
 
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -64,7 +65,7 @@ func Register(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		err = repo.CreateUser(req.Username, hashedPassword, "user")
+		err = repo.CreateUser(req.Username, hashedPassword, "user", req.DisplayName)
 		if err != nil {
 			c.JSON(http.StatusConflict, gin.H{"error": "Пользователь уже существует"})
 			return
@@ -110,7 +111,8 @@ func CreatePost(repo *models.Repository) gin.HandlerFunc {
 
 func GetPosts(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		posts, err := repo.GetPosts(50, 0)
+		// Используем новый метод с отображением имён
+		posts, err := repo.GetPostsWithUsers(50, 0)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка получения постов"})
 			return

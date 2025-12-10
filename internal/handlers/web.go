@@ -49,7 +49,8 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 
 func HomePage(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		posts, _ := repo.GetPosts(10, 0)
+		// Используем новый метод с пользователями
+		posts, _ := repo.GetPostsWithUsers(10, 0)
 		heroes, _ := repo.GetHeroes()
 
 		c.HTML(http.StatusOK, "index.html", gin.H{
@@ -64,5 +65,11 @@ func HomePage(repo *models.Repository) gin.HandlerFunc {
 func LoginPage() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, "login.html", nil)
+	}
+}
+
+func RegisterPage() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.HTML(http.StatusOK, "register.html", nil)
 	}
 }
