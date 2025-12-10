@@ -20,18 +20,18 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 		api.GET("/posts", GetPosts(repo))
 		api.GET("/heroes", GetHeroes(repo))
 
-		// Требуется авторизация
+		// Требуется авторизация - передаём репозиторий
 		authApi := api.Group("")
-		authApi.Use(AuthMiddleware(secret))
+		authApi.Use(AuthMiddleware(repo, secret)) // <- добавляем repo
 		{
 			authApi.POST("/posts", CreatePost(repo))
 			authApi.POST("/posts/:id/like", LikePost(repo))
 		}
 	}
 
-	// Админка
+	// Админка - также передаём репозиторий
 	admin := r.Group("/admin")
-	admin.Use(AuthMiddleware(secret), AdminMiddleware())
+	admin.Use(AuthMiddleware(repo, secret), AdminMiddleware()) // <- добавляем repo
 	{
 		admin.GET("/", AdminDashboard(repo))
 		admin.GET("/posts", AdminPosts(repo))

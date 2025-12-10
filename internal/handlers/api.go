@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -30,7 +29,7 @@ func Login(repo *models.Repository, secret string) gin.HandlerFunc {
 			return
 		}
 
-		token, err := auth.GenerateToken(user.Username, user.Role)
+		token, err := auth.GenerateToken(user.ID, user.Username, user.Role)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка генерации токена"})
 			return
@@ -78,20 +77,15 @@ func Register(repo *models.Repository) gin.HandlerFunc {
 // === POST HANDLERS ===
 func CreatePost(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// ДЛЯ ОТЛАДКИ: посмотрим, что в контексте
 		username, exists := c.Get("username")
 		if !exists {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
 			return
 		}
 
-		// Получаем user_id из базы данных по username
 		user, err := repo.GetUserByUsername(username.(string))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error":   "Пользователь не найден",
-				"details": err.Error(),
-			})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка получения пользователя"})
 			return
 		}
 
@@ -100,35 +94,17 @@ func CreatePost(repo *models.Repository) gin.HandlerFunc {
 		}
 
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error":   "Неверный формат запроса",
-				"details": err.Error(),
-			})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
 			return
 		}
-
-		if req.Content == "" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Содержание поста не может быть пустым"})
-			return
-		}
-
-		// ДЛЯ ОТЛАДКИ: логируем данные
-		log.Printf("Создание поста: user_id=%d, content='%s'", user.ID, req.Content)
 
 		err = repo.CreatePost(user.ID, req.Content, "团结")
 		if err != nil {
-			log.Printf("Ошибка создания поста: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error":   "Ошибка создания поста",
-				"details": err.Error(),
-			})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания поста"})
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{
-			"message": "Пост создан",
-			"slogan":  "团结",
-		})
+		c.JSON(http.StatusCreated, gin.H{"message": "Пост создан"})
 	}
 }
 
@@ -146,20 +122,40 @@ func GetPosts(repo *models.Repository) gin.HandlerFunc {
 
 func LikePost(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		username, exists := c.Get("username")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
+			return
+		}
+
+		user, err := repo.GetUserByUsername(username.(string))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка получения пользователя"})
+			return
+		}
+
 		idStr := c.Param("id")
-		id, err := strconv.Atoi(idStr)
+		postID, err := strconv.Atoi(idStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ID"})
 			return
 		}
 
-		err = repo.LikePost(id)
+		liked, err := repo.LikePost(postID, user.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка лайка"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Лайк добавлен"})
+		message := "Лайк добавлен"
+		if !liked {
+			message = "Лайк убран"
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": message,
+			"liked":   liked,
+		})
 	}
 }
 

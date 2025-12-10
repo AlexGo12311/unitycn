@@ -84,10 +84,78 @@ func (r *Repository) DeletePost(id int) error {
 	return err
 }
 
-func (r *Repository) LikePost(id int) error {
-	query := `UPDATE posts SET likes = likes + 1 WHERE id = $1`
-	_, err := r.db.Exec(query, id)
-	return err
+func (r *Repository) LikePost(postID, userID int) (bool, error) {
+	// Начинаем транзакцию
+	tx, err := r.db.Begin()
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback()
+
+	// Проверяем, ставил ли пользователь уже лайк
+	var exists bool
+	err = tx.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM post_likes WHERE post_id = $1 AND user_id = $2)",
+		postID, userID,
+	).Scan(&exists)
+
+	if err != nil {
+		return false, err
+	}
+
+	if exists {
+		// Убираем лайк (дизлайк)
+		_, err = tx.Exec("DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2", postID, userID)
+		if err != nil {
+			return false, err
+		}
+
+		// Уменьшаем счётчик лайков
+		_, err = tx.Exec("UPDATE posts SET likes = likes - 1 WHERE id = $1", postID)
+		if err != nil {
+			return false, err
+		}
+
+		err = tx.Commit()
+		return false, err // false = лайк убран
+
+	} else {
+		// Добавляем лайк
+		_, err = tx.Exec(
+			"INSERT INTO post_likes (post_id, user_id) VALUES ($1, $2)",
+			postID, userID,
+		)
+		if err != nil {
+			return false, err
+		}
+
+		// Увеличиваем счётчик лайков
+		_, err = tx.Exec("UPDATE posts SET likes = likes + 1 WHERE id = $1", postID)
+		if err != nil {
+			return false, err
+		}
+
+		err = tx.Commit()
+		return true, err // true = лайк добавлен
+	}
+}
+
+// Получить статус лайка пользователя
+func (r *Repository) GetUserLikeStatus(postID, userID int) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow(
+		"SELECT EXISTS(SELECT 1 FROM post_likes WHERE post_id = $1 AND user_id = $2)",
+		postID, userID,
+	).Scan(&exists)
+
+	return exists, err
+}
+
+// Получить количество лайков поста
+func (r *Repository) GetPostLikesCount(postID int) (int, error) {
+	var count int
+	err := r.db.QueryRow("SELECT likes FROM posts WHERE id = $1", postID).Scan(&count)
+	return count, err
 }
 
 // === HEROES (второй объект) ===
