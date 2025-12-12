@@ -26,6 +26,10 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 		{
 			authApi.POST("/posts", CreatePost(repo))
 			authApi.POST("/posts/:id/like", LikePost(repo))
+
+			authApi.POST("/posts/:post_id/comments", CreateComment(repo))
+			authApi.GET("/posts/:post_id/comments", GetComments(repo))
+			authApi.DELETE("/comments/:id", DeleteComment(repo))
 		}
 	}
 

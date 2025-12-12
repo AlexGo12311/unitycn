@@ -178,7 +178,7 @@ func CreateComment(repo *models.Repository) gin.HandlerFunc {
 		}
 
 		// Получаем ID поста из URL параметра
-		postIDStr := c.Param("post_id")
+		postIDStr := c.Param("id")
 		postID, err := strconv.Atoi(postIDStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ID поста"})
@@ -214,7 +214,7 @@ func CreateComment(repo *models.Repository) gin.HandlerFunc {
 
 func GetComments(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		postIDStr := c.Param("post_id")
+		postIDStr := c.Param("id")
 		postID, err := strconv.Atoi(postIDStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ID поста"})
