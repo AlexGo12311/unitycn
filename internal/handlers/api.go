@@ -161,6 +161,107 @@ func LikePost(repo *models.Repository) gin.HandlerFunc {
 	}
 }
 
+// === COMMENT HANDLERS ===
+
+func CreateComment(repo *models.Repository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		username, exists := c.Get("username")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
+			return
+		}
+
+		user, err := repo.GetUserByUsername(username.(string))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка получения пользователя"})
+			return
+		}
+
+		// Получаем ID поста из URL параметра
+		postIDStr := c.Param("post_id")
+		postID, err := strconv.Atoi(postIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ID поста"})
+			return
+		}
+
+		var req struct {
+			Content string `json:"content"`
+		}
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+			return
+		}
+
+		if req.Content == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Комментарий не может быть пустым"})
+			return
+		}
+
+		err = repo.CreateComment(postID, user.ID, req.Content)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка создания комментария"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Комментарий добавлен",
+			"post_id": postID,
+		})
+	}
+}
+
+func GetComments(repo *models.Repository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		postIDStr := c.Param("post_id")
+		postID, err := strconv.Atoi(postIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ID поста"})
+			return
+		}
+
+		comments, err := repo.GetCommentsByPostID(postID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка получения комментариев"})
+			return
+		}
+
+		c.JSON(http.StatusOK, comments)
+	}
+}
+
+func DeleteComment(repo *models.Repository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		username, exists := c.Get("username")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Пользователь не авторизован"})
+			return
+		}
+
+		user, err := repo.GetUserByUsername(username.(string))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка получения пользователя"})
+			return
+		}
+
+		commentIDStr := c.Param("id")
+		commentID, err := strconv.Atoi(commentIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ID комментария"})
+			return
+		}
+
+		err = repo.DeleteComment(commentID, user.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Комментарий удален"})
+	}
+}
+
 // === HERO HANDLERS ===
 func GetHeroes(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
