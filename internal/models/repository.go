@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -196,7 +197,93 @@ func (r *Repository) GetPostsWithUsers(limit, offset int) ([]Post, error) {
 	return posts, nil
 }
 
-// === HEROES (второй объект) ===
+// === COMMENT METHODS ===
+
+func (r *Repository) CreateComment(postID, userID int, content string) error {
+	query := `INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)`
+	_, err := r.db.Exec(query, postID, userID, content)
+	return err
+}
+
+func (r *Repository) GetCommentsByPostID(postID int) ([]Comment, error) {
+	query := `
+        SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
+               u.id, u.username, u.display_name, u.role, u.created_at
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = $1
+        ORDER BY c.created_at ASC
+    `
+
+	rows, err := r.db.Query(query, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var comments []Comment
+	for rows.Next() {
+		var comment Comment
+		var user User
+		err := rows.Scan(
+			&comment.ID, &comment.PostID, &comment.UserID, &comment.Content, &comment.CreatedAt,
+			&user.ID, &user.Username, &user.DisplayName, &user.Role, &user.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		comment.User = &user
+		comments = append(comments, comment)
+	}
+	return comments, nil
+}
+
+func (r *Repository) DeleteComment(commentID, userID int) error {
+	// Только автор комментария может удалить его
+	query := `DELETE FROM comments WHERE id = $1 AND user_id = $2`
+	result, err := r.db.Exec(query, commentID, userID)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return fmt.Errorf("комментарий не найден или нет прав на удаление")
+	}
+
+	return nil
+}
+
+func (r *Repository) GetPostWithComments(postID int) (*Post, []Comment, error) {
+	// Получаем пост
+	var post Post
+	var user User
+	err := r.db.QueryRow(`
+        SELECT p.id, p.user_id, p.content, p.slogan, p.likes, p.comments_count, p.created_at,
+               u.id, u.username, u.display_name, u.role, u.created_at
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.id = $1
+    `, postID).Scan(
+		&post.ID, &post.UserID, &post.Content, &post.Slogan, &post.Likes, &post.CommentsCount, &post.CreatedAt,
+		&user.ID, &user.Username, &user.DisplayName, &user.Role, &user.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+	post.User = &user
+
+	// Получаем комментарии
+	comments, err := r.GetCommentsByPostID(postID)
+	if err != nil {
+		return &post, nil, err
+	}
+
+	return &post, comments, nil
+}
+
+// === HEROES ===
 func (r *Repository) CreateHero(name, description, imageURL string, birthDate time.Time) error {
 	query := `INSERT INTO heroes (name, description, birth_date, image_url) VALUES ($1, $2, $3, $4)`
 	_, err := r.db.Exec(query, name, description, birthDate, imageURL)
