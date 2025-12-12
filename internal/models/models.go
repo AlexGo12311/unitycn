@@ -14,13 +14,14 @@ type User struct {
 }
 
 type Post struct {
-	ID        int       `json:"id"`
-	UserID    int       `json:"user_id"`
-	Content   string    `json:"content"`
-	Slogan    string    `json:"slogan"` // 团结 (Единство)
-	Likes     int       `json:"likes"`
-	CreatedAt time.Time `json:"created_at"`
-	User      *User     `json:"user,omitempty"`
+	ID            int       `json:"id"`
+	UserID        int       `json:"user_id"`
+	Content       string    `json:"content"`
+	Slogan        string    `json:"slogan"` // 团结 (Единство)
+	Likes         int       `json:"likes"`
+	CommentsCount int       `json:"comments_count"`
+	CreatedAt     time.Time `json:"created_at"`
+	User          *User     `json:"user,omitempty"`
 }
 
 type Hero struct {
@@ -30,4 +31,13 @@ type Hero struct {
 	BirthDate   time.Time `json:"birth_date"`
 	ImageURL    string    `json:"image_url"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+type Comment struct {
+	ID        int       `json:"id"`
+	PostID    int       `json:"post_id"`
+	UserID    int       `json:"user_id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+	User      *User     `json:"user,omitempty"`
 }

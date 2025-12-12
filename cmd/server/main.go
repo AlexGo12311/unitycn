@@ -97,13 +97,19 @@ func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 		api.POST("/register", handlers.Register(repo))
 		api.GET("/posts", handlers.GetPosts(repo))
 		api.GET("/heroes", handlers.GetHeroes(repo))
+		api.GET("/posts/:id/comments", handlers.GetComments(repo))
 
 		// Требуется авторизация - ПЕРЕДАЁМ РЕПОЗИТОРИЙ
 		authApi := api.Group("")
-		authApi.Use(handlers.AuthMiddleware(repo, secret)) // <- ВАЖНО: передаём repo
+		authApi.Use(handlers.AuthMiddleware(repo, secret))
 		{
 			authApi.POST("/posts", handlers.CreatePost(repo))
+
+			// Используем :id и для лайков, и для комментариев
 			authApi.POST("/posts/:id/like", handlers.LikePost(repo))
+			authApi.POST("/posts/:id/comments", handlers.CreateComment(repo))
+
+			authApi.DELETE("/comments/:id", handlers.DeleteComment(repo))
 		}
 	}
 
