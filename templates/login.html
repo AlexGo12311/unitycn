@@ -1,152 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Вход - Единство 团结</title>
+    <title>Вход - Единство</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; }
-        form { display: flex; flex-direction: column; gap: 10px; }
-        input, button { padding: 10px; font-size: 16px; }
-        .login-btn { 
-            background: #d32f2f; 
-            color: white; 
-            border: none; 
-            cursor: pointer; 
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
         }
-        .register-btn { 
-            background: #1976d2; 
-            color: white; 
-            border: none; 
-            cursor: pointer;
+        .error {
+            color: red;
+            background: #ffe6e6;
             padding: 10px;
-            margin-top: 10px;
-            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 15px;
         }
-        .link-btn {
-            background: none;
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
             border: none;
-            color: #1976d2;
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            text-decoration: underline;
-            padding: 0;
-            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>Вход в систему</h1>
-    <p>Для публикации постов требуется авторизация</p>
     
-    <form id="login-form">
-        <input type="text" id="username" placeholder="Логин" required>
-        <input type="password" id="password" placeholder="Пароль" required>
-        <button type="submit" class="login-btn">Войти</button>
+    {{if .error}}
+        <div class="error">{{.error}}</div>
+    {{end}}
+    
+    <form method="POST" action="/login">
+        <div class="form-group">
+            <label>Имя пользователя:</label>
+            <input type="text" name="username" required>
+        </div>
+        <div class="form-group">
+            <label>Пароль:</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Войти</button>
     </form>
     
-    <div style="margin-top: 20px; text-align: center;">
-        <p>Нет аккаунта? 
-            <a href="/register" style="color: #1976d2; text-decoration: none;">
-                <strong>Зарегистрироваться</strong>
-            </a>
-        </p>
-        
-        <div style="margin: 15px 0; border-top: 1px solid #eee; padding-top: 15px;">
-            <p style="color: #666; font-size: 0.9em;">Быстрые действия:</p>
-            <button onclick="registerTestUser()" class="link-btn">
-                Создать тестового пользователя
-            </button>
-        </div>
-        
-        <a href="/" style="color: #666; text-decoration: none; font-size: 0.9em;">
-            ← Вернуться на главную
-        </a>
-    </div>
-    
-    <script>
-    document.getElementById('login-form').onsubmit = async function(e) {
-        e.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        // Показываем индикатор загрузки
-        const submitBtn = document.querySelector('.login-btn');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Вход...';
-        submitBtn.disabled = true;
-        
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('token', data.token);
-                
-                // Показываем успешное сообщение
-                submitBtn.textContent = 'Успешно!';
-                submitBtn.style.backgroundColor = '#388e3c';
-                
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 500);
-            } else {
-                const error = await response.json();
-                alert('Ошибка входа: ' + (error.error || 'Неверный логин или пароль'));
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        } catch (error) {
-            alert('Сетевая ошибка. Проверьте подключение.');
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-    };
-    
-    async function registerTestUser() {
-        const username = 'comrade_' + Math.floor(Math.random() * 1000);
-        const password = 'proletariat123';
-        
-        if (!confirm(`Создать тестового пользователя?\nЛогин: ${username}\nПароль: ${password}`)) {
-            return;
-        }
-        
-        try {
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    username: username, 
-                    password: password,
-                    display_name: 'Товарищ ' + Math.floor(Math.random() * 100)
-                })
-            });
-            
-            if (response.ok) {
-                alert(`Товарищ создан! 🚩\nЛогин: ${username}\nПароль: ${password}\n\nТеперь можете войти.`);
-                document.getElementById('username').value = username;
-                document.getElementById('password').value = password;
-            } else {
-                const error = await response.json();
-                alert('Ошибка регистрации: ' + (error.error || 'Неизвестная ошибка'));
-            }
-        } catch (error) {
-            alert('Сетевая ошибка при регистрации');
-        }
-    }
-    
-    // Автозаполнение для демонстрации (можно удалить в продакшене)
-    document.addEventListener('DOMContentLoaded', function() {
-        // Если есть тестовый пользователь в localStorage
-        const testUser = localStorage.getItem('test_user');
-        if (testUser) {
-            const user = JSON.parse(testUser);
-            document.getElementById('username').value = user.username;
-            document.getElementById('password').value = user.password;
-        }
-    });
-    </script>
+    <p style="margin-top: 20px;">
+        <a href="/">На главную</a> | 
+        <a href="/register">Регистрация</a>
+    </p>
 </body>
 </html>

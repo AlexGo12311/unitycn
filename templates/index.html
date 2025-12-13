@@ -6,17 +6,106 @@
         body {
             font-family: Arial, sans-serif;
             margin: 40px;
+            background: #f9f9f9;
+        }
+
+        .user-info {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .user-info-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-info-right {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .admin-link {
+            color: #d32f2f;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #d32f2f;
+            border-radius: 4px;
+        }
+        
+        .admin-link:hover {
+            background: #d32f2f;
+            color: white;
+        }
+        
+        .auth-link {
+            color: #1976d2;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #1976d2;
+            border-radius: 4px;
+        }
+        
+        .auth-link:hover {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .user-role {
+            background: #1976d2;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .user-role.admin {
+            background: #d32f2f;
+        }
+        
+        .logout-link {
+            color: #666;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #666;
+            border-radius: 4px;
+        }
+        
+        .logout-link:hover {
+            background: #666;
+            color: white;
         }
 
         .post {
             border: 1px solid #ccc;
             padding: 15px;
             margin: 10px 0;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .slogan {
             color: #d32f2f;
             font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.5em;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
         }
 
         .like-btn {
@@ -25,6 +114,7 @@
             padding: 5px 10px;
             cursor: pointer;
             margin-left: 10px;
+            border-radius: 4px;
         }
 
         .like-btn:hover {
@@ -59,8 +149,18 @@
         .post-content {
             margin: 10px 0;
             line-height: 1.5;
+            font-size: 1.1em;
         }
 
+        #post-form {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
         #post-form button {
             background: #d32f2f;
             color: white;
@@ -71,6 +171,7 @@
             margin-top: 10px;
             border-radius: 4px;
             font-weight: bold;
+            width: 100%;
         }
         
         #post-form button:hover {
@@ -84,6 +185,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            margin-bottom: 10px;
         }
 
         .post-stats {
@@ -131,6 +233,7 @@
             border-radius: 4px;
             font-family: inherit;
             resize: vertical;
+            min-height: 60px;
         }
 
         .add-comment button {
@@ -140,6 +243,11 @@
             padding: 8px 15px;
             border-radius: 4px;
             cursor: pointer;
+            align-self: flex-start;
+        }
+
+        .add-comment button:hover {
+            background: #1565c0;
         }
 
         .comment {
@@ -153,139 +261,312 @@
         .comment-author {
             font-weight: bold;
             margin-bottom: 5px;
+            color: #333;
         }
 
         .comment-content {
             margin: 5px 0;
+            line-height: 1.4;
         }
 
         .comment-date {
             font-size: 0.8em;
             color: #888;
         }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .heroes-section {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 30px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .heroes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .hero-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .hero-card img {
+            max-width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .hero-card h4 {
+            margin: 10px 0 5px 0;
+            color: #333;
+        }
+
+        .hero-card p {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .post-form-note {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .post-form-note a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+
+        .post-form-note a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <h1>{{.title}}</h1>
-    <h2 class="slogan">{{.slogan}}</h2>
-
-    <div style="margin: 20px 0; padding: 10px; background: #f5f5f5; border-radius: 4px;">
-        <strong>Товарищ:</strong> 
-        <span id="auth-info">
-            <!-- Динамически заполнится JavaScript -->
-        </span>
-    </div>
-
-    <h3>Создать пост:</h3>
-    <div id="post-form">
-        <input type="text" id="post-content" placeholder="Товарищ, поделитесь мыслями...">
-        <button onclick="createPost()">发布 (Опубликовать)</button>
-    </div>
-
-    <h3>Последние посты:</h3>
-    <div id="posts-container">
-        {{if .posts}}
-            {{range .posts}}
-            <div class="post" id="post-{{.ID}}">
-                <div class="post-author">
-                    <strong>
-                        {{if .User}}
-                            {{if .User.DisplayName}}
-                                {{.User.DisplayName}}
-                            {{else}}
-                                {{.User.Username}}
-                            {{end}}
-                        {{else}}
-                            Аноним
-                        {{end}}
-                    </strong>
-                    <small class="user-id">ID: {{.UserID}}</small>
-                </div>
-
-                <div class="post-content">{{.Content}}</div>
-
-                <div class="post-stats">
-                    <span>👍 <span id="likes-{{.ID}}">{{.Likes}}</span></span>
-                    <span class="timestamp">{{.CreatedAt.Format "02.01.2006 15:04"}}</span>
-                </div>
-
-                <div class="post-actions">
-                    <button class="like-btn" data-post-id="{{.ID}}" onclick="likePost({{.ID}})">
-                        Поддержать
-                    </button>
-                    <button class="comment-btn" onclick="toggleComments({{.ID}})">
-                        Ответить
-                    </button>
-                </div>
-
-                <!-- Секция комментариев (скрыта по умолчанию) -->
-                <div class="comments-section" id="comments-{{.ID}}" style="display: none;">
-                    <div class="add-comment">
-                        <textarea id="comment-input-{{.ID}}" placeholder="Ваш комментарий..." rows="2"></textarea>
-                        <button onclick="addComment({{.ID}})">Отправить</button>
-                    </div>
-                    <div class="comments-list" id="comments-list-{{.ID}}">
-                        <div>Загрузка комментариев...</div>
-                    </div>
-                </div>
+    <div class="container">
+        <h1>{{.title}}</h1>
+        <h2 class="slogan">{{.slogan}}</h2>
+        
+        <!-- Блок информации о пользователе -->
+        <div class="user-info">
+            <div class="user-info-left">
+                <strong>Товарищ:</strong> 
+                {{if .user}}
+                    <span>{{.user.Username}}</span>
+                    <span class="user-role {{if eq .user.Role "admin"}}admin{{end}}">
+                        {{if eq .user.Role "admin"}}Админ{{else}}Пользователь{{end}}
+                    </span>
+                {{else}}
+                    <span style="color: #999;">Гость</span>
+                {{end}}
             </div>
+            
+            <div class="user-info-right">
+                {{if .user}}
+                    {{if eq .user.Role "admin"}}
+                        <a href="/admin" class="admin-link">Админ-панель</a>
+                    {{end}}
+                    <a href="/logout" onclick="return confirm('Вы уверены?')" class="logout-link">Выйти</a>
+                {{else}}
+                    <a href="/login" class="auth-link">Войти</a>
+                    <a href="/register" class="auth-link">Регистрация</a>
+                {{end}}
+            </div>
+        </div>
+
+        <!-- Форма создания поста -->
+        <div id="post-form">
+            <input type="text" id="post-content" placeholder="Товарищ, поделитесь мыслями...">
+            {{if .user}}
+                <button onclick="createPost()">发布 (Опубликовать)</button>
+            {{else}}
+                <button onclick="window.location.href='/login'" style="background: #666;">
+                    Войдите, чтобы публиковать
+                </button>
+                <p class="post-form-note">
+                    Чтобы создать пост, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>
+                </p>
             {{end}}
-        {{else}}
-            <p>Пока нет постов. Будьте первым!</p>
+        </div>
+
+        <!-- Секция героев -->
+        {{if .heroes}}
+        <div class="heroes-section">
+            <h3>Герои пролетариата:</h3>
+            <div class="heroes-grid">
+                {{range .heroes}}
+                <div class="hero-card">
+                    {{if .ImageURL}}
+                        <img src="{{.ImageURL}}" alt="{{.Name}}">
+                    {{else}}
+                        <div style="height: 120px; background: #eee; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #999;">
+                            Нет фото
+                        </div>
+                    {{end}}
+                    <h4>{{.Name}}</h4>
+                    <p>{{.Description}}</p>
+                    <small>{{.BirthDate.Format "02.01.2006"}}</small>
+                </div>
+                {{end}}
+            </div>
+        </div>
         {{end}}
+
+        <!-- Последние посты -->
+        <h3>Последние посты:</h3>
+        <div id="posts-container">
+            {{if .posts}}
+                {{range .posts}}
+                <div class="post" id="post-{{.ID}}">
+                    <div class="post-author">
+                        <strong>
+                            {{if .User}}
+                                {{if .User.DisplayName}}
+                                    {{.User.DisplayName}}
+                                {{else}}
+                                    {{.User.Username}}
+                                {{end}}
+                            {{else}}
+                                Аноним
+                            {{end}}
+                        </strong>
+                        <small class="user-id">ID: {{.UserID}}</small>
+                    </div>
+
+                    <div class="post-content">{{.Content}}</div>
+
+                    <div class="post-stats">
+                        <span>👍 <span id="likes-{{.ID}}">{{.Likes}}</span></span>
+                        <span class="timestamp">{{.CreatedAt.Format "02.01.2006 15:04"}}</span>
+                    </div>
+
+                    <div class="post-actions">
+                        <button class="like-btn" data-post-id="{{.ID}}" onclick="likePost({{.ID}})">
+                            Поддержать
+                        </button>
+                        <button class="comment-btn" onclick="toggleComments({{.ID}})">
+                            Ответить
+                        </button>
+                    </div>
+
+                    <!-- Секция комментариев (скрыта по умолчанию) -->
+                    <div class="comments-section" id="comments-{{.ID}}" style="display: none;">
+                        <div class="add-comment">
+                            <textarea id="comment-input-{{.ID}}" placeholder="Ваш комментарий..." rows="2"></textarea>
+                            <button onclick="addComment({{.ID}})">Отправить</button>
+                        </div>
+                        <div class="comments-list" id="comments-list-{{.ID}}">
+                            <div>Загрузка комментариев...</div>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            {{else}}
+                <p style="text-align: center; color: #666; padding: 20px;">
+                    Пока нет постов. Будьте первым!
+                </p>
+            {{end}}
+        </div>
     </div>
 
-    <script>
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            updateAuthInfo();
-        });
+<script>
+    // ========== ОБЩИЕ ФУНКЦИИ ==========
+    
+    // Функция для получения куки
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+    }
 
-        // Обновление информации об авторизации
-        function updateAuthInfo() {
-            const authInfo = document.getElementById('auth-info');
-            const token = localStorage.getItem('token');
-            
+    // Функция очистки авторизации
+    function clearAuth() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    // Универсальная функция получения токена
+    function getAuthToken() {
+        // 1. Проверяем localStorage (приоритет для API)
+        let token = localStorage.getItem('token');
+        
+        // 2. Если нет, проверяем куки
+        if (!token) {
+            token = getCookie('token');
             if (token) {
-                try {
-                    const payload = JSON.parse(atob(token.split('.')[1]));
-                    authInfo.innerHTML = `<strong>${payload.username}</strong> | 
-                        <a href="#" onclick="logout()" style="color: #d32f2f;">Выйти</a>`;
-                } catch (e) {
-                    authInfo.innerHTML = `
-                        <a href="/login">Войти</a> | 
-                        <a href="/register">Регистрация</a>`;
-                }
-            } else {
-                authInfo.innerHTML = `
-                    <a href="/login">Войти</a> | 
-                    <a href="/register">Регистрация</a>`;
+                // Синхронизируем в localStorage для API
+                localStorage.setItem('token', token);
             }
         }
+        
+        return token;
+    }
 
-        // Выход из системы
-        function logout() {
-            localStorage.removeItem('token');
-            updateAuthInfo();
-            location.reload();
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        updateAuthInfo();
+    });
+
+    // Обновление информации об авторизации
+    function updateAuthInfo() {
+        const token = getAuthToken();
+        
+        if (token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                console.log('Пользователь авторизован:', payload.username);
+            } catch (e) {
+                console.log('Ошибка токена:', e);
+                clearAuth();
+            }
+        }
+    }
+
+    // ========== АВТОРИЗАЦИЯ ==========
+    
+    // Выход из системы
+// Выход из системы
+function logout() {
+    if (confirm('Вы уверены, что хотите выйти?')) {
+        // 1. Очищаем localStorage
+        localStorage.removeItem('token');
+        
+        // 2. Отправляем запрос на сервер для очистки куки
+        fetch('/logout')
+            .then(response => {
+                // 3. Перезагружаем страницу
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Ошибка при выходе:', error);
+                window.location.href = '/';
+            });
+    }
+}
+
+    // ========== ПОСТЫ ==========
+    
+    // Создание поста
+    async function createPost() {
+        const content = document.getElementById('post-content').value.trim();
+        const token = getAuthToken(); // Используем универсальную функцию
+
+        if (!token) {
+            alert('Сначала войдите в систему!');
+            window.location.href = '/login';
+            return;
         }
 
-        // Создание поста
-        async function createPost() {
-            const content = document.getElementById('post-content').value.trim();
-            const token = localStorage.getItem('token');
+        if (!content) {
+            alert('Введите текст поста!');
+            return;
+        }
 
-            if (!token) {
-                alert('Сначала войдите в систему!');
-                window.location.href = '/login';
-                return;
-            }
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = 'Публикация...';
+        button.disabled = true;
 
-            if (!content) {
-                alert('Введите текст поста!');
-                return;
-            }
-
+        try {
             const response = await fetch('/api/posts', {
                 method: 'POST',
                 headers: {
@@ -299,146 +580,185 @@
                 document.getElementById('post-content').value = '';
                 location.reload();
             } else {
-                alert('Ошибка создания поста');
+                const error = await response.json();
+                alert('Ошибка: ' + (error.error || 'Неизвестная ошибка'));
             }
+        } catch (error) {
+            alert('Сетевая ошибка: ' + error.message);
+        } finally {
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+    }
+
+    // Лайк поста
+    async function likePost(postId) {
+        const token = getAuthToken(); // Используем универсальную функцию
+        if (!token) {
+            alert('Войдите, чтобы ставить лайки!');
+            window.location.href = '/login';
+            return;
         }
 
-        // Лайк поста
-        async function likePost(postId) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('Войдите, чтобы ставить лайки!');
-                window.location.href = '/login';
-                return;
-            }
+        const button = document.querySelector(`[data-post-id="${postId}"]`);
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = '...';
 
-            const button = document.querySelector(`[data-post-id="${postId}"]`);
-            button.disabled = true;
-
-            try {
-                const response = await fetch(`/api/posts/${postId}/like`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    // Обновляем счетчик лайков
-                    const likesSpan = document.getElementById(`likes-${postId}`);
-                    if (likesSpan) {
-                        const currentLikes = parseInt(likesSpan.textContent) || 0;
-                        likesSpan.textContent = result.liked ? currentLikes + 1 : currentLikes - 1;
-                    }
-                    
-                    // Перезагружаем страницу через 0.5 сек
-                    setTimeout(() => location.reload(), 500);
+        try {
+            const response = await fetch(`/api/posts/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
                 }
-            } catch (error) {
-                alert('Сетевая ошибка');
-            } finally {
-                button.disabled = false;
-            }
-        }
+            });
 
-        // Показать/скрыть комментарии
-        function toggleComments(postId) {
-            const commentsSection = document.getElementById(`comments-${postId}`);
-            const button = event.target;
-            
-            if (commentsSection.style.display === 'none') {
-                commentsSection.style.display = 'block';
-                button.textContent = 'Скрыть';
-                loadComments(postId);
+            if (response.ok) {
+                const result = await response.json();
+                
+                // Обновляем счетчик лайков
+                const likesSpan = document.getElementById(`likes-${postId}`);
+                if (likesSpan) {
+                    const currentLikes = parseInt(likesSpan.textContent) || 0;
+                    likesSpan.textContent = result.liked ? currentLikes + 1 : currentLikes - 1;
+                }
+                
+                // Визуальная обратная связь
+                button.textContent = result.liked ? '👍 Поддержано' : 'Поддержать';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 1000);
             } else {
-                commentsSection.style.display = 'none';
-                button.textContent = 'Ответить';
-            }
-        }
-
-        // Загрузка комментариев
-        async function loadComments(postId) {
-            const commentsList = document.getElementById(`comments-list-${postId}`);
-            
-            if (!commentsList) return;
-            
-            commentsList.innerHTML = '<div>Загрузка...</div>';
-            
-            try {
-                const response = await fetch(`/api/posts/${postId}/comments`);
-                
-                if (response.ok) {
-                    const comments = await response.json();
-                    
-                    if (!comments || comments.length === 0) {
-                        commentsList.innerHTML = '<div style="color: #666;">Комментариев пока нет</div>';
-                    } else {
-                        let html = '';
-                        comments.forEach(comment => {
-                            const userName = comment.user ? 
-                                (comment.user.display_name || comment.user.username || 'Аноним') : 
-                                'Аноним';
-                            const date = new Date(comment.created_at).toLocaleString('ru-RU');
-                            
-                            html += `
-                            <div class="comment">
-                                <div class="comment-author">${userName}</div>
-                                <div class="comment-content">${comment.content}</div>
-                                <div class="comment-date">${date}</div>
-                            </div>`;
-                        });
-                        commentsList.innerHTML = html;
-                    }
-                } else {
-                    commentsList.innerHTML = '<div style="color: #666;">Комментариев пока нет</div>';
-                }
-            } catch (error) {
-                commentsList.innerHTML = '<div style="color: #666;">Комментариев пока нет</div>';
-            }
-        }
-
-        // Добавление комментария
-        async function addComment(postId) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('Войдите, чтобы комментировать!');
-                window.location.href = '/login';
-                return;
-            }
-            
-            const input = document.getElementById(`comment-input-${postId}`);
-            const content = input.value.trim();
-            
-            if (!content) {
-                alert('Введите текст комментария!');
-                return;
-            }
-            
-            const button = event.target;
-            button.disabled = true;
-            
-            try {
-                const response = await fetch(`/api/posts/${postId}/comments`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                    body: JSON.stringify({ content: content })
-                });
-                
-                if (response.ok) {
-                    input.value = '';
-                    loadComments(postId);
-                }
-            } catch (error) {
-                alert('Ошибка');
-            } finally {
+                const error = await response.json();
+                alert('Ошибка: ' + (error.error || 'Неизвестная ошибка'));
+                button.textContent = originalText;
                 button.disabled = false;
             }
+        } catch (error) {
+            alert('Сетевая ошибка');
+            button.textContent = originalText;
+            button.disabled = false;
         }
-    </script>
+    }
+
+    // ========== КОММЕНТАРИИ ==========
+    
+    // Показать/скрыть комментарии
+    function toggleComments(postId) {
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        const button = event.target;
+        
+        if (commentsSection.style.display === 'none') {
+            commentsSection.style.display = 'block';
+            button.textContent = 'Скрыть';
+            loadComments(postId);
+        } else {
+            commentsSection.style.display = 'none';
+            button.textContent = 'Ответить';
+        }
+    }
+
+    // Загрузка комментариев
+    async function loadComments(postId) {
+        const commentsList = document.getElementById(`comments-list-${postId}`);
+        
+        if (!commentsList) return;
+        
+        commentsList.innerHTML = '<div style="color: #666; text-align: center;">Загрузка...</div>';
+        
+        try {
+            const response = await fetch(`/api/posts/${postId}/comments`);
+            
+            if (response.ok) {
+                const comments = await response.json();
+                
+                if (!comments || comments.length === 0) {
+                    commentsList.innerHTML = '<div style="color: #666; text-align: center;">Комментариев пока нет</div>';
+                } else {
+                    let html = '';
+                    comments.forEach(comment => {
+                        const userName = comment.user ? 
+                            (comment.user.display_name || comment.user.username || 'Аноним') : 
+                            'Аноним';
+                        const date = new Date(comment.created_at).toLocaleString('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        html += `
+                        <div class="comment">
+                            <div class="comment-author">${userName}</div>
+                            <div class="comment-content">${comment.content}</div>
+                            <div class="comment-date">${date}</div>
+                        </div>`;
+                    });
+                    commentsList.innerHTML = html;
+                }
+            } else {
+                commentsList.innerHTML = '<div style="color: #666; text-align: center;">Ошибка загрузки</div>';
+            }
+        } catch (error) {
+            commentsList.innerHTML = '<div style="color: #666; text-align: center;">Сетевая ошибка</div>';
+        }
+    }
+
+    // Добавление комментария
+    async function addComment(postId) {
+        const token = getAuthToken(); // Используем универсальную функцию
+        if (!token) {
+            alert('Войдите, чтобы комментировать!');
+            window.location.href = '/login';
+            return;
+        }
+        
+        const input = document.getElementById(`comment-input-${postId}`);
+        const content = input.value.trim();
+        
+        if (!content) {
+            alert('Введите текст комментария!');
+            return;
+        }
+        
+        const button = event.target;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Отправка...';
+        
+        try {
+            const response = await fetch(`/api/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ content: content })
+            });
+            
+            if (response.ok) {
+                input.value = '';
+                button.textContent = '✓ Отправлено';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    loadComments(postId);
+                }, 1000);
+            } else {
+                const error = await response.json();
+                alert('Ошибка: ' + (error.error || 'Неизвестная ошибка'));
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        } catch (error) {
+            alert('Сетевая ошибка');
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+    }
+</script>
+
 </body>
 </html>

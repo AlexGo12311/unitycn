@@ -80,53 +80,11 @@ func main() {
 
 func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 	r := gin.Default()
-
-	// Статические файлы
 	r.Static("/static", "./static")
 	r.LoadHTMLGlob("templates/*.html")
 
-	// Основные маршруты
-	r.GET("/", handlers.HomePage(repo))
-	r.GET("/login", handlers.LoginPage())
-	r.GET("/register", handlers.RegisterPage())
-
-	// API
-	api := r.Group("/api")
-	{
-		api.POST("/login", handlers.Login(repo, secret))
-		api.POST("/register", handlers.Register(repo))
-		api.GET("/posts", handlers.GetPosts(repo))
-		api.GET("/heroes", handlers.GetHeroes(repo))
-		api.GET("/posts/:id/comments", handlers.GetComments(repo))
-
-		// Требуется авторизация
-		authApi := api.Group("")
-		authApi.Use(handlers.AuthMiddleware(repo, secret))
-		{
-			authApi.POST("/posts", handlers.CreatePost(repo))
-			authApi.POST("/posts/:id/like", handlers.LikePost(repo))
-			authApi.POST("/posts/:id/comments", handlers.CreateComment(repo))
-
-			authApi.DELETE("/comments/:id", handlers.DeleteComment(repo))
-		}
-	}
-
-	// Админка
-	admin := r.Group("/admin")
-	admin.Use(handlers.AuthMiddleware(repo, secret), handlers.AdminMiddleware())
-	{
-		admin.GET("/", handlers.AdminDashboard(repo))
-		admin.GET("/posts", handlers.AdminPosts(repo))
-		admin.POST("/posts", handlers.CreatePostAdmin(repo))
-		admin.DELETE("/posts/:id", handlers.DeletePost(repo))
-
-		admin.GET("/heroes", handlers.AdminHeroes(repo))
-		admin.POST("/heroes", handlers.CreateHero(repo))
-		admin.PUT("/heroes/:id", handlers.UpdateHero(repo))
-		admin.DELETE("/heroes/:id", handlers.DeleteHero(repo))
-
-		admin.GET("/users", handlers.GetUsers(repo))
-	}
+	// Используем RegisterRoutes из web.go
+	handlers.RegisterRoutes(r, repo, secret)
 
 	return r
 }

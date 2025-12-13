@@ -37,6 +37,23 @@ func (r *Repository) GetUserByUsername(username string) (*User, error) {
 	return &user, nil
 }
 
+func (r *Repository) GetUserByID(id int) (*User, error) {
+	var user User
+	query := `SELECT id, username, password, role, display_name, created_at 
+	          FROM users WHERE id = $1`
+
+	err := r.db.QueryRow(query, id).Scan(
+		&user.ID, &user.Username, &user.Password, &user.Role,
+		&user.DisplayName, &user.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 // === POSTS ===
 func (r *Repository) CreatePost(userID int, content, slogan string) error {
 	query := `INSERT INTO posts (user_id, content, slogan) VALUES ($1, $2, $3)`

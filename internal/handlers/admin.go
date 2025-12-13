@@ -95,7 +95,6 @@ func AdminHeroes(repo *models.Repository) gin.HandlerFunc {
 }
 
 func GetUsers(repo *models.Repository) gin.HandlerFunc {
-	// Заглушка - нужно добавить метод GetUsers в репозиторий
 	return func(c *gin.Context) {
 		c.JSON(http.StatusNotImplemented, gin.H{"message": "В разработке"})
 	}
