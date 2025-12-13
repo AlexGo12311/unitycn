@@ -28,7 +28,7 @@ type Config struct {
 
 func main() {
 	// Включим подробное логирование
-	log.Println("=== Запуск Communist Twitter ===")
+	log.Println("=== Запуск Платформы Единство ===")
 
 	// Чтение конфига
 	configFile, err := os.Open("config.yaml")
@@ -72,7 +72,7 @@ func main() {
 	r := setupRouter(repo, config.Server.Secret)
 
 	// Запуск сервера
-	log.Printf("🚀 Сервер запущен на http://localhost%s", config.Server.Port)
+	log.Printf("Сервер запущен на http://localhost%s", config.Server.Port)
 	if err := r.Run(config.Server.Port); err != nil {
 		log.Fatal("Ошибка запуска сервера:", err)
 	}
@@ -99,13 +99,11 @@ func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 		api.GET("/heroes", handlers.GetHeroes(repo))
 		api.GET("/posts/:id/comments", handlers.GetComments(repo))
 
-		// Требуется авторизация - ПЕРЕДАЁМ РЕПОЗИТОРИЙ
+		// Требуется авторизация
 		authApi := api.Group("")
 		authApi.Use(handlers.AuthMiddleware(repo, secret))
 		{
 			authApi.POST("/posts", handlers.CreatePost(repo))
-
-			// Используем :id и для лайков, и для комментариев
 			authApi.POST("/posts/:id/like", handlers.LikePost(repo))
 			authApi.POST("/posts/:id/comments", handlers.CreateComment(repo))
 
@@ -113,9 +111,9 @@ func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 		}
 	}
 
-	// Админка - ТАКЖЕ ПЕРЕДАЁМ РЕПОЗИТОРИЙ
+	// Админка
 	admin := r.Group("/admin")
-	admin.Use(handlers.AuthMiddleware(repo, secret), handlers.AdminMiddleware()) // <- передаём repo
+	admin.Use(handlers.AuthMiddleware(repo, secret), handlers.AdminMiddleware())
 	{
 		admin.GET("/", handlers.AdminDashboard(repo))
 		admin.GET("/posts", handlers.AdminPosts(repo))

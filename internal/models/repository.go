@@ -90,7 +90,6 @@ func (r *Repository) DeletePost(id int) error {
 }
 
 func (r *Repository) LikePost(postID, userID int) (bool, error) {
-	// Начинаем транзакцию
 	tx, err := r.db.Begin()
 	if err != nil {
 		return false, err
@@ -109,7 +108,7 @@ func (r *Repository) LikePost(postID, userID int) (bool, error) {
 	}
 
 	if exists {
-		// Убираем лайк (дизлайк)
+		// Убираем лайк
 		_, err = tx.Exec("DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2", postID, userID)
 		if err != nil {
 			return false, err

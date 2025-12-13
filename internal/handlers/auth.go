@@ -49,42 +49,6 @@ func AuthMiddleware(repo *models.Repository, secret string) gin.HandlerFunc {
 	}
 }
 
-// Альтернативная версия без репозитория (если хранить user_id в токене)
-func AuthMiddlewareSimple(secret string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Требуется авторизация"})
-			c.Abort()
-			return
-		}
-
-		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
-			tokenString = tokenString[7:]
-		}
-
-		claims, err := auth.VerifyToken(tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный токен"})
-			c.Abort()
-			return
-		}
-
-		// Сохраняем данные пользователя в контексте
-		c.Set("username", claims["username"].(string))
-		c.Set("role", claims["role"].(string))
-
-		// Пытаемся получить user_id из токена (если он там есть)
-		if userID, ok := claims["user_id"].(float64); ok {
-			c.Set("user_id", int(userID))
-		} else {
-			c.Set("user_id", 0)
-		}
-
-		c.Next()
-	}
-}
-
 func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		role, exists := c.Get("role")

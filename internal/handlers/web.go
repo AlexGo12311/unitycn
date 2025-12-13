@@ -33,9 +33,9 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 		}
 	}
 
-	// Админка - также передаём репозиторий
+	// Админка
 	admin := r.Group("/admin")
-	admin.Use(AuthMiddleware(repo, secret), AdminMiddleware()) // <- добавляем repo
+	admin.Use(AuthMiddleware(repo, secret), AdminMiddleware())
 	{
 		admin.GET("/", AdminDashboard(repo))
 		admin.GET("/posts", AdminPosts(repo))
@@ -53,7 +53,7 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 
 func HomePage(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Используем новый метод с пользователями
+
 		posts, _ := repo.GetPostsWithUsers(10, 0)
 		heroes, _ := repo.GetHeroes()
 
