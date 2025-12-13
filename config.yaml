@@ -12,4 +12,4 @@ database:
 
 admin:
   username: "admin"
-  password: "$2a$10$YourHashedPasswordHere"
+  password: "$2b$10$xr4.dNv7AKDVs3ptGiq8LOui1lZ2SWR7zQwHjs1QzG7uX9sxubus." 
