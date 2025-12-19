@@ -441,6 +441,7 @@ func (r *Repository) DeleteUser(userID int) error {
 }
 
 // GetAllPostsAdmin - получение всех постов для админки
+
 func (r *Repository) GetAllPostsAdmin() ([]Post, error) {
 	rows, err := r.db.Query(`
         SELECT 
@@ -508,7 +509,6 @@ func (r *Repository) DeletePostAdmin(postID int) error {
 	return err
 }
 
-// GetPostByID - получение поста по ID
 // GetPostByID - получение поста по ID
 func (r *Repository) GetPostByID(postID int) (*Post, error) {
 	var post Post
