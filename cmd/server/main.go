@@ -82,7 +82,7 @@ func main() {
 func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 	r := gin.Default()
 	r.Static("/static", "./static")
-	tmpl := template.Must(template.ParseGlob("templates/*.html"))
+	tmpl := template.Must(template.New("").ParseGlob("templates/*.html"))
 	tmpl = template.Must(tmpl.ParseGlob("templates/admin/*.html"))
 
 	r.SetHTMLTemplate(tmpl)

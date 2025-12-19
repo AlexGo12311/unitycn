@@ -21,7 +21,7 @@ func AdminDashboard(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin/base.html", gin.H{
+		c.HTML(http.StatusOK, "admin/dashboard.html", gin.H{
 			"title": "Админ-панель",
 			"stats": stats,
 		})
@@ -39,7 +39,7 @@ func AdminUsers(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin/base.html", gin.H{
+		c.HTML(http.StatusOK, "admin/users.html", gin.H{
 			"title": "Управление пользователями",
 			"users": users,
 		})
@@ -124,7 +124,7 @@ func AdminPosts(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin/base.html", gin.H{
+		c.HTML(http.StatusOK, "admin/posts.html", gin.H{
 			"title": "Управление постами",
 			"posts": posts,
 		})
@@ -173,7 +173,7 @@ func EditPostPage(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin/base.html", gin.H{
+		c.HTML(http.StatusOK, "admin/edit_post.html", gin.H{
 			"title": "Редактирование поста",
 			"post":  post,
 		})
@@ -227,7 +227,7 @@ func AdminComments(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin/base.html", gin.H{
+		c.HTML(http.StatusOK, "admin/comments.html", gin.H{
 			"title":    "Управление комментариями",
 			"comments": comments,
 		})
@@ -267,7 +267,7 @@ func AdminHeroes(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin/base.html", gin.H{
+		c.HTML(http.StatusOK, "admin/heroes.html", gin.H{
 			"title":  "Управление героями",
 			"heroes": heroes,
 		})
