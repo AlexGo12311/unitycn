@@ -74,20 +74,15 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 	}
 }
 
-// Другие функции идут ПОСЛЕ закрывающей фигурной скобки
 func HomePage(repo *models.Repository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Получаем пользователя из контекста (AuthMiddleware должен был его установить)
 		var userObj *models.User
-
-		// Способ 1: Проверяем, установлен ли user в контексте
 		if userData, exists := c.Get("user"); exists {
 			if user, ok := userData.(*models.User); ok {
 				userObj = user
 			}
 		}
 
-		// Способ 2: Если нет в контексте, пытаемся получить по user_id
 		if userObj == nil {
 			if userID, exists := c.Get("user_id"); exists {
 				if userIDInt, ok := userID.(int); ok && userIDInt > 0 {
