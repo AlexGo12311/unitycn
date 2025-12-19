@@ -1,0 +1,35 @@
+{{define "content"}}
+<div class="d-flex justify-between align-center mb-3">
+    <h3>Список постов</h3>
+</div>
+
+<table class="table">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Автор</th>
+    <th>Содержание</th>
+    <th>Лайки</th>
+    <th>Дата</th>
+    <th>Действия</th>
+</tr>
+</thead>
+<tbody>
+{{range .posts}}
+<tr>
+    <td>{{.ID}}</td>
+    <td>{{if .User}}{{if .User.DisplayName}}{{.User.DisplayName}}{{else}}{{.User.Username}}{{end}}<small>({{.User.Role}})</small>{{else}}Удаленный пользователь{{end}}</td>
+    <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;">{{.Content}}</td>
+    <td>{{.Likes}}</td>
+    <td>{{.CreatedAt.Format "02.01.2006 15:04"}}</td>
+    <td>
+        <div class="d-flex gap-2">
+            <a href="/admin/posts/{{.ID}}/edit" class="btn btn-warning btn-sm">Редактировать</a>
+            <button class="btn btn-danger btn-sm" onclick="deletePost({{.ID}})">Удалить</button>
+        </div>
+    </td>
+</tr>
+{{end}}
+</tbody>
+</table>
+{{end}}

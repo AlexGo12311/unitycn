@@ -338,7 +338,9 @@ func (r *Repository) DeleteHero(id int) error {
 	return err
 }
 
-// === ADMIN STATISTICS ===
+// === АДМИН МЕТОДЫ ===
+// GetStats - получение статистики
+// GetStats - получение статистики
 func (r *Repository) GetStats() (map[string]int, error) {
 	stats := make(map[string]int)
 
@@ -348,7 +350,7 @@ func (r *Repository) GetStats() (map[string]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	stats["users"] = userCount
+	stats["TotalUsers"] = userCount
 
 	// Количество постов
 	var postCount int
@@ -356,7 +358,15 @@ func (r *Repository) GetStats() (map[string]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	stats["posts"] = postCount
+	stats["TotalPosts"] = postCount
+
+	// Количество комментариев
+	var commentCount int
+	err = r.db.QueryRow("SELECT COUNT(*) FROM comments").Scan(&commentCount)
+	if err != nil {
+		return nil, err
+	}
+	stats["TotalComments"] = commentCount
 
 	// Количество героев
 	var heroCount int
@@ -364,7 +374,179 @@ func (r *Repository) GetStats() (map[string]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	stats["heroes"] = heroCount
+	stats["TotalHeroes"] = heroCount
 
 	return stats, nil
+}
+
+// GetAllUsers - получение всех пользователей
+func (r *Repository) GetAllUsers() ([]User, error) {
+	rows, err := r.db.Query(`
+		SELECT id, username, role, display_name, created_at 
+		FROM users 
+		ORDER BY created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []User
+	for rows.Next() {
+		var user User
+		err := rows.Scan(
+			&user.ID, &user.Username, &user.Role,
+			&user.DisplayName, &user.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// UpdateUserRole - обновление роли пользователя
+func (r *Repository) UpdateUserRole(userID int, role string) error {
+	_, err := r.db.Exec(
+		"UPDATE users SET role = $1 WHERE id = $2",
+		role, userID,
+	)
+	return err
+}
+
+// DeleteUser - удаление пользователя
+func (r *Repository) DeleteUser(userID int) error {
+	// Сначала удаляем связанные данные
+	_, err := r.db.Exec("DELETE FROM post_likes WHERE user_id = $1", userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec("DELETE FROM comments WHERE user_id = $1", userID)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec("DELETE FROM posts WHERE user_id = $1", userID)
+	if err != nil {
+		return err
+	}
+
+	// Затем удаляем пользователя
+	_, err = r.db.Exec("DELETE FROM users WHERE id = $1", userID)
+	return err
+}
+
+// GetAllPostsAdmin - получение всех постов для админки
+// GetAllPostsAdmin - получение всех постов для админки
+func (r *Repository) GetAllPostsAdmin() ([]Post, error) {
+	rows, err := r.db.Query(`
+		SELECT p.id, p.user_id, p.content, p.slogan, p.likes, p.created_at,
+		       u.username, u.display_name, u.role
+		FROM posts p
+		LEFT JOIN users u ON p.user_id = u.id
+		ORDER BY p.created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []Post
+	for rows.Next() {
+		var post Post
+		var user User
+		err := rows.Scan(
+			&post.ID, &post.UserID, &post.Content, &post.Slogan,
+			&post.Likes, &post.CreatedAt,
+			&user.Username, &user.DisplayName, &user.Role,
+		)
+		if err != nil {
+			return nil, err
+		}
+		post.User = &user
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+// DeletePostAdmin - удаление поста (админская версия)
+func (r *Repository) DeletePostAdmin(postID int) error {
+	// Удаляем лайки
+	_, err := r.db.Exec("DELETE FROM post_likes WHERE post_id = $1", postID)
+	if err != nil {
+		return err
+	}
+
+	// Удаляем комментарии
+	_, err = r.db.Exec("DELETE FROM comments WHERE post_id = $1", postID)
+	if err != nil {
+		return err
+	}
+
+	// Удаляем пост
+	_, err = r.db.Exec("DELETE FROM posts WHERE id = $1", postID)
+	return err
+}
+
+// GetPostByID - получение поста по ID
+// GetPostByID - получение поста по ID
+func (r *Repository) GetPostByID(postID int) (*Post, error) {
+	var post Post
+	err := r.db.QueryRow(`
+		SELECT id, user_id, content, slogan, likes, created_at
+		FROM posts WHERE id = $1
+	`, postID).Scan(
+		&post.ID, &post.UserID, &post.Content,
+		&post.Slogan, &post.Likes, &post.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &post, nil
+}
+
+// GetAllCommentsAdmin - получение всех комментариев для админки
+// GetAllCommentsAdmin - получение всех комментариев для админки
+func (r *Repository) GetAllCommentsAdmin() ([]Comment, error) {
+	rows, err := r.db.Query(`
+		SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
+		       u.username, u.display_name
+		FROM comments c
+		LEFT JOIN users u ON c.user_id = u.id
+		ORDER BY c.created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var comments []Comment
+	for rows.Next() {
+		var comment Comment
+		var user User
+		err := rows.Scan(
+			&comment.ID, &comment.PostID, &comment.UserID,
+			&comment.Content, &comment.CreatedAt,
+			&user.Username, &user.DisplayName,
+		)
+		if err != nil {
+			return nil, err
+		}
+		comment.User = &user
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+}
+
+// DeleteCommentAdmin - удаление комментария (админская версия)
+func (r *Repository) DeleteCommentAdmin(commentID int) error {
+	_, err := r.db.Exec("DELETE FROM comments WHERE id = $1", commentID)
+	return err
 }

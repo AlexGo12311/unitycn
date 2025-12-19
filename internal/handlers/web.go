@@ -47,17 +47,30 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 	admin := r.Group("/admin")
 	admin.Use(AuthMiddleware(repo, secret), AdminMiddleware())
 	{
+		// Дашборд
 		admin.GET("/", AdminDashboard(repo))
-		admin.GET("/posts", AdminPosts(repo))
-		admin.POST("/posts", CreatePostAdmin(repo))
-		admin.DELETE("/posts/:id", DeletePost(repo))
 
+		// Пользователи
+		admin.GET("/users", AdminUsers(repo))
+		admin.PUT("/users/:id/role", UpdateUserRole(repo))
+		admin.DELETE("/users/:id", DeleteUserAdmin(repo))
+
+		// Посты
+		admin.GET("/posts", AdminPosts(repo))
+		admin.GET("/posts/:id/edit", EditPostPage(repo))
+		admin.PUT("/posts/:id", UpdatePostAdmin(repo))
+		admin.DELETE("/posts/:id", DeletePostAdmin(repo))
+
+		// Комментарии
+		admin.GET("/comments", AdminComments(repo))
+		admin.DELETE("/comments/:id", DeleteCommentAdmin(repo))
+
+		// Герои
 		admin.GET("/heroes", AdminHeroes(repo))
 		admin.POST("/heroes", CreateHero(repo))
 		admin.PUT("/heroes/:id", UpdateHero(repo))
 		admin.DELETE("/heroes/:id", DeleteHero(repo))
-
-		admin.GET("/users", GetUsers(repo))
+		admin.GET("/heroes/:id", GetHeroByID(repo))
 	}
 }
 

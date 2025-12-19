@@ -1,20 +1,29 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Админ-панель - Единство 团结</title>
-</head>
-<body>
-    <h1>Панель управления</h1>
-    <nav>
-        <a href="/admin/posts">Управление постами</a>
-        <a href="/admin/heroes">Управление героями</a>
-    </nav>
-    
-    <div>
-        <h2>Статистика</h2>
-        <p>Всего постов: {{.totalPosts}}</p>
-        <p>Всего пользователей: {{.totalUsers}}</p>
+{{define "content"}}
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Пользователей</h3>
+        <div class="number">{{.stats.TotalUsers}}</div>
     </div>
-</body>
-</html>
+    <div class="stat-card">
+        <h3>Постов</h3>
+        <div class="number">{{.stats.TotalPosts}}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Комментариев</h3>
+        <div class="number">{{.stats.TotalComments}}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Героев</h3>
+        <div class="number">{{.stats.TotalHeroes}}</div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <h3>Быстрые действия</h3>
+    <div class="d-flex gap-2 mt-3">
+        <a href="/admin/users" class="btn btn-primary">👥 Управление пользователями</a>
+        <a href="/admin/posts" class="btn btn-primary">📝 Управление постами</a>
+        <a href="/admin/heroes" class="btn btn-primary">⭐ Управление героями</a>
+    </div>
+</div>
+{{end}}

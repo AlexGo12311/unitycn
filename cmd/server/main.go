@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"html/template"
 	"unitycn/internal/auth"
 	"unitycn/internal/database"
 	"unitycn/internal/handlers"
@@ -81,7 +82,10 @@ func main() {
 func setupRouter(repo *models.Repository, secret string) *gin.Engine {
 	r := gin.Default()
 	r.Static("/static", "./static")
-	r.LoadHTMLGlob("templates/*.html")
+	tmpl := template.Must(template.ParseGlob("templates/*.html"))
+	tmpl = template.Must(tmpl.ParseGlob("templates/admin/*.html"))
+
+	r.SetHTMLTemplate(tmpl)
 
 	// Используем RegisterRoutes из web.go
 	handlers.RegisterRoutes(r, repo, secret)
