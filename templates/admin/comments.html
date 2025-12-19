@@ -1,40 +1,38 @@
 {{ define "admin/comments.html" }}
-    {{ template "admin/base" . }}
+    {{ template "admin/header" . }}
+    <div class="card shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Пост</th>
+                    <th>Автор</th>
+                    <th>Комментарий</th>
+                    <th>Дата</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .comments}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td><a href="/admin/posts/{{.PostID}}/edit" class="badge bg-secondary text-decoration-none">#{{.PostID}}</a></td>
+                    <td>
+                        {{if .User}}
+                            {{if .User.DisplayName}}{{.User.DisplayName}}{{else}}{{.User.Username}}{{end}}
+                        {{else}}
+                            <span class="text-muted">Удален</span>
+                        {{end}}
+                    </td>
+                    <td style="max-width:350px;" class="text-truncate">{{.Content}}</td>
+                    <td>{{.CreatedAt.Format "02.01.2006 15:04"}}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteComment({{.ID}})">Удалить</button>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{ template "admin/footer" . }}
 {{ end }}
-
-{{ define "page_content" }}
-<div class="card shadow-sm">
-    <table class="table table-hover mb-0">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Пост</th>
-                <th>Автор</th>
-                <th>Комментарий</th>
-                <th>Дата</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{range .comments}}
-            <tr>
-                <td>{{.ID}}</td>
-                <td><a href="/admin/posts/{{.PostID}}/edit" class="badge bg-secondary text-decoration-none">#{{.PostID}}</a></td>
-                <td>
-                    {{if .User}}
-                        {{if .User.DisplayName}}{{.User.DisplayName}}{{else}}{{.User.Username}}{{end}}
-                    {{else}}
-                        <span class="text-muted">Удален</span>
-                    {{end}}
-                </td>
-                <td style="max-width:350px;" class="text-truncate">{{.Content}}</td>
-                <td>{{.CreatedAt.Format "02.01.2006 15:04"}}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteComment({{.ID}})">Удалить</button>
-                </td>
-            </tr>
-            {{end}}
-        </tbody>
-    </table>
-</div>
-{{end}}

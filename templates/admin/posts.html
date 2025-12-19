@@ -1,31 +1,29 @@
 {{ define "admin/posts.html" }}
-    {{ template "admin/base" . }}
-{{ end }}
-
-{{ define "page_content" }}
-<div class="card shadow-sm">
-    <table class="table table-hover mb-0">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Автор</th>
-                <th>Контент</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{range .posts}}
-            <tr>
-                <td>{{.ID}}</td>
-                <td>{{if .User}}{{.User.Username}}{{else}}Удален{{end}}</td>
-                <td class="text-truncate" style="max-width: 250px;">{{.Content}}</td>
-                <td>
-                    <a href="/admin/posts/{{.ID}}/edit" class="btn btn-sm btn-warning">Править</a>
-                    <button class="btn btn-sm btn-danger" onclick="deletePost({{.ID}})">Удалить</button>
-                </td>
-            </tr>
-            {{end}}
-        </tbody>
-    </table>
-</div>
+    {{ template "admin/header" . }}
+    <div class="card shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Автор</th>
+                    <th>Контент</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .posts}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>{{if .User}}{{.User.Username}}{{else}}Удален{{end}}</td>
+                    <td class="text-truncate" style="max-width: 250px;">{{.Content}}</td>
+                    <td>
+                        <a href="/admin/posts/{{.ID}}/edit" class="btn btn-sm btn-warning">Править</a>
+                        <button class="btn btn-sm btn-danger" onclick="deletePost({{.ID}})">Удалить</button>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{ template "admin/footer" . }}
 {{ end }}

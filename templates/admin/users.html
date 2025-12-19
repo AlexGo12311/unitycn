@@ -1,32 +1,30 @@
 {{ define "admin/users.html" }}
-    {{ template "admin/base" . }}
-{{ end }}
-
-{{ define "page_content" }}
-<div class="card shadow-sm">
-    <table class="table table-hover mb-0">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Роль</th>
-                <th>Дата</th>
-                <th>Действие</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{range .users}}
-            <tr>
-                <td>{{.ID}}</td>
-                <td>{{.Username}} <br><small class="text-muted">{{.DisplayName}}</small></td>
-                <td><span class="badge bg-info">{{.Role}}</span></td>
-                <td>{{.CreatedAt.Format "02.01.06"}}</td>
-                <td>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteUser({{.ID}})">Удалить</button>
-                </td>
-            </tr>
-            {{end}}
-        </tbody>
-    </table>
-</div>
+    {{ template "admin/header" . }}
+    <div class="card shadow-sm">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Роль</th>
+                    <th>Дата</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .users}}
+                <tr>
+                    <td>{{.ID}}</td>
+                    <td>{{.Username}} <br><small class="text-muted">{{.DisplayName}}</small></td>
+                    <td><span class="badge bg-info">{{.Role}}</span></td>
+                    <td>{{.CreatedAt.Format "02.01.06"}}</td>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteUser({{.ID}})">Удалить</button>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{ template "admin/footer" . }}
 {{ end }}

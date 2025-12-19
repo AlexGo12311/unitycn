@@ -1,12 +1,10 @@
 {{ define "admin/dashboard.html" }}
-    {{ template "admin/base" . }}
-{{ end }}
-
-{{ define "page_content" }}
-<div class="row g-3">
-    <div class="col-md-3"><div class="stat-card"><h3>Пользователей</h3><div class="number">{{.stats.TotalUsers}}</div></div></div>
-    <div class="col-md-3"><div class="stat-card"><h3>Постов</h3><div class="number">{{.stats.TotalPosts}}</div></div></div>
-    <div class="col-md-3"><div class="stat-card"><h3>Комментариев</h3><div class="number">{{.stats.TotalComments}}</div></div></div>
-    <div class="col-md-3"><div class="stat-card"><h3>Героев</h3><div class="number">{{.stats.TotalHeroes}}</div></div></div>
-</div>
+    {{ template "admin/header" . }}
+    <div class="row g-3">
+        <div class="col-md-3"><div class="stat-card"><h3>Пользователей</h3><div class="number">{{.stats.TotalUsers}}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><h3>Постов</h3><div class="number">{{.stats.TotalPosts}}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><h3>Комментариев</h3><div class="number">{{.stats.TotalComments}}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><h3>Героев</h3><div class="number">{{.stats.TotalHeroes}}</div></div></div>
+    </div>
+    {{ template "admin/footer" . }}
 {{ end }}
