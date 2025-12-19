@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -440,15 +441,20 @@ func (r *Repository) DeleteUser(userID int) error {
 }
 
 // GetAllPostsAdmin - получение всех постов для админки
-// GetAllPostsAdmin - получение всех постов для админки
+
 func (r *Repository) GetAllPostsAdmin() ([]Post, error) {
 	rows, err := r.db.Query(`
-		SELECT p.id, p.user_id, p.content, p.slogan, p.likes, p.created_at,
-		       u.username, u.display_name, u.role
-		FROM posts p
-		LEFT JOIN users u ON p.user_id = u.id
-		ORDER BY p.created_at DESC
-	`)
+        SELECT 
+            p.id, p.user_id, p.content, p.slogan, p.likes, p.created_at,
+            COALESCE(u.id, 0) as user_id,
+            COALESCE(u.username, 'Удален') as username,
+            COALESCE(u.display_name, '') as display_name,
+            COALESCE(u.role, 'user') as role,
+            COALESCE(u.created_at, NOW()) as user_created_at
+        FROM posts p
+        LEFT JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+    `)
 	if err != nil {
 		return nil, err
 	}
@@ -458,16 +464,27 @@ func (r *Repository) GetAllPostsAdmin() ([]Post, error) {
 	for rows.Next() {
 		var post Post
 		var user User
+
+		// ВАЖНО: порядок полей должен соответствовать запросу выше
 		err := rows.Scan(
+			// Пост поля (6 полей)
 			&post.ID, &post.UserID, &post.Content, &post.Slogan,
 			&post.Likes, &post.CreatedAt,
-			&user.Username, &user.DisplayName, &user.Role,
+			// User поля (5 полей)
+			&user.ID, &user.Username, &user.DisplayName, &user.Role, &user.CreatedAt,
 		)
 		if err != nil {
+			log.Printf("Ошибка сканирования поста: %v", err)
 			return nil, err
 		}
+
 		post.User = &user
 		posts = append(posts, post)
+	}
+
+	// Проверяем ошибки после итерации
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return posts, nil
@@ -493,7 +510,6 @@ func (r *Repository) DeletePostAdmin(postID int) error {
 }
 
 // GetPostByID - получение поста по ID
-// GetPostByID - получение поста по ID
 func (r *Repository) GetPostByID(postID int) (*Post, error) {
 	var post Post
 	err := r.db.QueryRow(`
@@ -512,15 +528,19 @@ func (r *Repository) GetPostByID(postID int) (*Post, error) {
 }
 
 // GetAllCommentsAdmin - получение всех комментариев для админки
-// GetAllCommentsAdmin - получение всех комментариев для админки
 func (r *Repository) GetAllCommentsAdmin() ([]Comment, error) {
 	rows, err := r.db.Query(`
-		SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
-		       u.username, u.display_name
-		FROM comments c
-		LEFT JOIN users u ON c.user_id = u.id
-		ORDER BY c.created_at DESC
-	`)
+        SELECT 
+            c.id, c.post_id, c.user_id, c.content, c.created_at,
+            COALESCE(u.id, 0) as user_id,
+            COALESCE(u.username, 'Удален') as username,
+            COALESCE(u.display_name, '') as display_name,
+            COALESCE(u.role, 'user') as role,
+            COALESCE(u.created_at, NOW()) as user_created_at
+        FROM comments c
+        LEFT JOIN users u ON c.user_id = u.id
+        ORDER BY c.created_at DESC
+    `)
 	if err != nil {
 		return nil, err
 	}
@@ -530,16 +550,25 @@ func (r *Repository) GetAllCommentsAdmin() ([]Comment, error) {
 	for rows.Next() {
 		var comment Comment
 		var user User
+
 		err := rows.Scan(
+			// Comment поля (5 полей)
 			&comment.ID, &comment.PostID, &comment.UserID,
 			&comment.Content, &comment.CreatedAt,
-			&user.Username, &user.DisplayName,
+			// User поля (5 полей)
+			&user.ID, &user.Username, &user.DisplayName, &user.Role, &user.CreatedAt,
 		)
 		if err != nil {
+			log.Printf("Ошибка сканирования комментария: %v", err)
 			return nil, err
 		}
+
 		comment.User = &user
 		comments = append(comments, comment)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return comments, nil
