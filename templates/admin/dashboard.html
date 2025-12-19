@@ -1,20 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Админ-панель - Единство 团结</title>
-</head>
-<body>
-    <h1>Панель управления</h1>
-    <nav>
-        <a href="/admin/posts">Управление постами</a>
-        <a href="/admin/heroes">Управление героями</a>
-    </nav>
-    
-    <div>
-        <h2>Статистика</h2>
-        <p>Всего постов: {{.totalPosts}}</p>
-        <p>Всего пользователей: {{.totalUsers}}</p>
+{{ define "admin/dashboard.html" }}
+    {{ template "admin/header" . }}
+    <div class="row g-3">
+        <div class="col-md-3"><div class="stat-card"><h3>Пользователей</h3><div class="number">{{.stats.TotalUsers}}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><h3>Постов</h3><div class="number">{{.stats.TotalPosts}}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><h3>Комментариев</h3><div class="number">{{.stats.TotalComments}}</div></div></div>
+        <div class="col-md-3"><div class="stat-card"><h3>Героев</h3><div class="number">{{.stats.TotalHeroes}}</div></div></div>
     </div>
-</body>
-</html>
+    {{ template "admin/footer" . }}
+{{ end }}

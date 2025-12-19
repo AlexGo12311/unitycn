@@ -1,0 +1,46 @@
+{{ define "admin/edit_post.html" }}
+    {{ template "admin/header" . }}
+    <div class="mb-4">
+        <a href="/admin/posts" class="btn btn-link p-0 text-decoration-none">← Вернуться к списку</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+                <div class="form-group mb-3">
+                    <label class="form-label fw-bold">Содержание поста:</label>
+                    <textarea class="form-control" id="postContent" rows="10">{{.post.Content}}</textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary" onclick="savePost({{.post.ID}})">Сохранить изменения</button>
+                    <button type="button" class="btn btn-outline-danger" onclick="deletePost({{.post.ID}})">Удалить пост</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 bg-light">
+                <h5 class="card-title">Метаданные</h5>
+                <hr>
+                <p><strong>ID:</strong> {{.post.ID}}</p>
+                <p><strong>Лайков:</strong> <span class="badge bg-success">{{.post.Likes}}</span></p>
+                <p><strong>Создан:</strong> <br> {{.post.CreatedAt.Format "02.01.2006 15:04"}}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    async function savePost(id) {
+        const content = document.getElementById('postContent').value;
+        const res = await fetch(`/admin/posts/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        });
+        if (res.ok) { alert("Сохранено!"); location.href = "/admin/posts"; } 
+        else { alert("Ошибка сохранения"); }
+    }
+    </script>
+    {{ template "admin/footer" . }}
+{{ end }}

@@ -1,0 +1,66 @@
+{{ define "admin/header" }}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - Админ-панель</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { display: flex; min-height: 100vh; background: #f4f7f6; }
+        .sidebar { width: 250px; background: #343a40; color: white; padding: 20px; position: fixed; height: 100vh; }
+        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 10px; }
+        .sidebar a.active { color: white; background: #495057; border-radius: 5px; }
+        .main-content { flex: 1; margin-left: 250px; padding: 30px; width: calc(100% - 250px); }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+        .number { font-size: 24px; font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h3>Unity Admin</h3>
+        <hr>
+        <nav>
+            <a href="/admin/" class="{{if eq .title "Админ-панель"}}active{{end}}">📊 Дашборд</a>
+            <a href="/admin/users" class="{{if eq .title "Управление пользователями"}}active{{end}}">👥 Пользователи</a>
+            <a href="/admin/posts" class="{{if eq .title "Управление постами"}}active{{end}}">📝 Посты</a>
+            <a href="/admin/comments" class="{{if eq .title "Управление комментариями"}}active{{end}}">💬 Комментарии</a>
+            <a href="/admin/heroes" class="{{if eq .title "Управление героями"}}active{{end}}">⭐ Герои</a>
+            <hr>
+            <a href="/" target="_blank">🌐 На сайт</a>
+            <a href="/logout" style="color: #ff6b6b;">🚪 Выйти</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="mb-4">
+            <h2>{{.title}}</h2>
+        </header>
+{{ end }}
+
+{{ define "admin/footer" }}
+    </div>
+
+    <script>
+        async function apiCall(url, method, body = null) {
+            const options = { method };
+            if (body) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(body);
+            }
+            const res = await fetch(url, options);
+            if (res.ok) {
+                location.reload();
+            } else {
+                const data = await res.json();
+                alert("Ошибка: " + (data.error || "Неизвестная ошибка"));
+            }
+        }
+
+        function deleteUser(id) { if(confirm('Удалить пользователя?')) apiCall(`/admin/users/${id}`, 'DELETE'); }
+        function deletePost(id) { if(confirm('Удалить пост?')) apiCall(`/admin/posts/${id}`, 'DELETE'); }
+        function deleteComment(id) { if(confirm('Удалить комментарий?')) apiCall(`/admin/comments/${id}`, 'DELETE'); }
+    </script>
+</body>
+</html>
+{{ end }}

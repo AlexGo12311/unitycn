@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"unitycn/internal/auth"
 	"unitycn/internal/models"
@@ -11,42 +12,111 @@ import (
 )
 
 // === AUTH HANDLERS ===
-func Login(repo *models.Repository, secret string) gin.HandlerFunc {
+
+// Logout - выход из системы
+func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req struct {
-			Username string `json:"username"`
-			Password string `json:"password"`
-		}
+		// Удаляем куку с токеном
+		c.SetCookie("token", "", -1, "/", "", false, true)
 
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
-			return
-		}
+		// Определяем тип запроса
+		isAPI := strings.Contains(c.Request.Header.Get("Accept"), "application/json") ||
+			strings.HasPrefix(c.Request.URL.Path, "/api/")
 
-		user, err := repo.GetUserByUsername(req.Username)
-		if err != nil || !auth.CheckPasswordHash(req.Password, user.Password) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверные учетные данные"})
-			return
+		if isAPI {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "Вы успешно вышли из системы",
+			})
+		} else {
+			// Для веб-страниц перенаправляем на главную
+			c.Redirect(http.StatusFound, "/")
 		}
-
-		token, err := auth.GenerateToken(user.ID, user.Username, user.Role)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка генерации токена"})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"token": token,
-			"user": gin.H{
-				"id":       user.ID,
-				"username": user.Username,
-				"role":     user.Role,
-			},
-		})
 	}
 }
 
-func Register(repo *models.Repository) gin.HandlerFunc {
+func Login(repo *models.Repository, secret string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Определяем тип запроса
+		contentType := c.ContentType()
+		var username, password string
+
+		if contentType == "application/x-www-form-urlencoded" {
+			// Веб-форма
+			username = c.PostForm("username")
+			password = c.PostForm("password")
+		} else if contentType == "application/json" {
+			// API запрос
+			var req struct {
+				Username string `json:"username"`
+				Password string `json:"password"`
+			}
+
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+				return
+			}
+
+			username = req.Username
+			password = req.Password
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный Content-Type"})
+			return
+		}
+
+		// Проверка пользователя
+		user, err := repo.GetUserByUsername(username)
+		if err != nil || !auth.CheckPasswordHash(password, user.Password) {
+			if contentType == "application/x-www-form-urlencoded" {
+				c.HTML(http.StatusUnauthorized, "login.html", gin.H{
+					"error": "Неверные учетные данные",
+				})
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверные учетные данные"})
+			}
+			return
+		}
+
+		// Генерация токена
+		token, err := auth.GenerateToken(user.ID, user.Username, user.Role)
+		if err != nil {
+			if contentType == "application/x-www-form-urlencoded" {
+				c.HTML(http.StatusInternalServerError, "login.html", gin.H{
+					"error": "Ошибка авторизации",
+				})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка генерации токена"})
+			}
+			return
+		}
+
+		// Устанавливаем куку в любом случае
+		c.SetCookie("token", token, 24*3600, "/", "", false, true)
+
+		// Ответ в зависимости от типа запроса
+		if contentType == "application/x-www-form-urlencoded" {
+			// Для веб-формы: отправляем на страницу редиректа
+			c.HTML(http.StatusOK, "auth_redirect.html", gin.H{
+				"token":    token,
+				"username": user.Username,
+				"role":     user.Role,
+				"user_id":  user.ID,
+				"redirect": "/",
+			})
+		} else {
+			// Для API: возвращаем JSON
+			c.JSON(http.StatusOK, gin.H{
+				"token": token,
+				"user": gin.H{
+					"id":       user.ID,
+					"username": user.Username,
+					"role":     user.Role,
+				},
+			})
+		}
+	}
+}
+
+func Register(repo *models.Repository, secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req struct {
 			Username    string `json:"username"`
@@ -54,8 +124,22 @@ func Register(repo *models.Repository) gin.HandlerFunc {
 			DisplayName string `json:"display_name,omitempty"`
 		}
 
-		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+		// Определяем тип запроса
+		contentType := c.ContentType()
+
+		if contentType == "application/x-www-form-urlencoded" {
+			// Веб-форма
+			req.Username = c.PostForm("username")
+			req.Password = c.PostForm("password")
+			req.DisplayName = c.PostForm("display_name")
+		} else if contentType == "application/json" {
+			// API запрос
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный формат запроса"})
+				return
+			}
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный Content-Type"})
 			return
 		}
 
@@ -71,7 +155,47 @@ func Register(repo *models.Repository) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"message": "Пользователь создан"})
+		// АВТОМАТИЧЕСКАЯ АВТОРИЗАЦИЯ ПОСЛЕ РЕГИСТРАЦИИ
+		// Получаем созданного пользователя
+		user, err := repo.GetUserByUsername(req.Username)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка авторизации после регистрации"})
+			return
+		}
+
+		// Генерация токена
+		token, err := auth.GenerateToken(user.ID, user.Username, user.Role)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка генерации токена"})
+			return
+		}
+
+		// Устанавливаем куку
+		c.SetCookie("token", token, 24*3600, "/", "", false, true)
+
+		// Ответ в зависимости от типа запроса
+		if contentType == "application/x-www-form-urlencoded" {
+			// Для веб-формы: отправляем на страницу редиректа
+			c.HTML(http.StatusOK, "auth_redirect.html", gin.H{
+				"token":    token,
+				"username": user.Username,
+				"role":     user.Role,
+				"user_id":  user.ID,
+				"redirect": "/",
+				"message":  "Регистрация успешна! Вы авторизованы.",
+			})
+		} else {
+			// Для API: возвращаем JSON
+			c.JSON(http.StatusCreated, gin.H{
+				"message": "Пользователь создан",
+				"token":   token,
+				"user": gin.H{
+					"id":       user.ID,
+					"username": user.Username,
+					"role":     user.Role,
+				},
+			})
+		}
 	}
 }
 
@@ -359,4 +483,5 @@ func DeleteHero(repo *models.Repository) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{"message": "Герой удален"})
 	}
+
 }

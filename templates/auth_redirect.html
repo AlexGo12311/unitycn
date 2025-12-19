@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Авторизация</title>
+    <script>
+        // Сохраняем токен в localStorage для JavaScript
+        const token = '{{.token}}';
+        if (token) {
+            localStorage.setItem('token', token);
+            console.log('Токен сохранен в localStorage');
+        }
+        
+        // Перенаправляем на главную
+        setTimeout(function() {
+            window.location.href = '{{.redirect}}';
+        }, 100);
+    </script>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px;">
+        <h2>Авторизация успешна</h2>
+        <p>Перенаправление на главную страницу...</p>
+    </div>
+</body>
+</html>
