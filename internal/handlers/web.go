@@ -58,7 +58,7 @@ func RegisterRoutes(r *gin.Engine, repo *models.Repository, secret string) {
 		// Посты
 		admin.GET("/posts", AdminPosts(repo))
 		admin.GET("/posts/:id/edit", EditPostPage(repo))
-		admin.PUT("/posts/:id", UpdatePostAdmin(repo))
+		admin.POST("/posts/:id", UpdatePostAdmin(repo))
 		admin.DELETE("/posts/:id", DeletePostAdmin(repo))
 
 		// Комментарии
